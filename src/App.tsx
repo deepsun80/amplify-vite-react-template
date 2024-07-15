@@ -9,14 +9,28 @@ const client = generateClient<Schema>();
 function App() {
   const [todos, setTodos] = useState<Array<Schema["Todo"]["type"]>>([]);
 
+  const fetchTodos = async () => {
+    const { data: items, errors } = await client.models.Todo.list();
+    setTodos(items);
+  };
+
+  // useEffect(() => {
+  //   client.models.Todo.observeQuery().subscribe({
+  //     next: (data) => setTodos([...data.items]),
+  //   });
+  // }, []);
   useEffect(() => {
-    client.models.Todo.observeQuery().subscribe({
-      next: (data) => setTodos([...data.items]),
-    });
+    fetchTodos();
   }, []);
 
-  function createTodo() {
-    client.models.Todo.create({ content: window.prompt("Todo content") });
+
+  const createTodo = async () => {
+    await client.models.Todo.create({
+      content: window.prompt("Todo content?"),
+      // isDone: false,
+    });
+
+    fetchTodos();
   }
 
     
